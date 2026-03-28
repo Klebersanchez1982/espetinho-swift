@@ -174,29 +174,35 @@ const GarcomPage = () => {
 
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
           {products
-            .filter((p) => p.category === activeCategory && p.available)
-            .map((p) => (
-              <div key={p.id} className="flex items-center justify-between rounded-lg border border-border bg-card p-3">
-                <div>
-                  <p className="font-medium">{p.name}</p>
-                  <p className="text-sm text-primary font-semibold">R$ {p.price.toFixed(2)}</p>
-                  <p className="text-xs text-muted-foreground">Estoque: {p.stock}</p>
+            .filter((p) => p.category === activeCategory && p.available && p.stock > 0)
+            .map((p) => {
+              const inCart = cart[p.id] || 0;
+              const canAdd = inCart < p.stock;
+              return (
+                <div key={p.id} className="flex items-center justify-between rounded-lg border border-border bg-card p-3">
+                  <div>
+                    <p className="font-medium">{p.name}</p>
+                    <p className="text-sm text-primary font-semibold">R$ {p.price.toFixed(2)}</p>
+                    <p className={`text-xs ${p.stock <= 5 ? 'text-warning font-semibold' : 'text-muted-foreground'}`}>
+                      Estoque: {p.stock}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {inCart > 0 && (
+                      <>
+                        <Button variant="outline" size="icon-lg" onClick={() => removeFromCart(p.id)}>
+                          <Minus className="h-4 w-4" />
+                        </Button>
+                        <span className="w-8 text-center font-bold text-lg">{inCart}</span>
+                      </>
+                    )}
+                    <Button variant="default" size="icon-lg" onClick={() => addToCart(p.id)} disabled={!canAdd}>
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  {cart[p.id] ? (
-                    <>
-                      <Button variant="outline" size="icon-lg" onClick={() => removeFromCart(p.id)}>
-                        <Minus className="h-4 w-4" />
-                      </Button>
-                      <span className="w-8 text-center font-bold text-lg">{cart[p.id]}</span>
-                    </>
-                  ) : null}
-                  <Button variant="default" size="icon-lg" onClick={() => addToCart(p.id)}>
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
         </div>
 
         {cartCount > 0 && (

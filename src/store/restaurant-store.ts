@@ -36,12 +36,33 @@ export const useRestaurantStore = create<RestaurantState>((set) => ({
     })),
 
   orders: [],
-  addOrder: (order) => set((s) => ({ orders: [...s.orders, order] })),
+  addOrder: (order) => set((s) => ({
+    orders: [...s.orders, order],
+    // Auto deduct stock
+    products: s.products.map((p) => {
+      const totalQty = order.items
+        .filter((i) => i.productId === p.id)
+        .reduce((sum, i) => sum + i.quantity, 0);
+      if (totalQty > 0) {
+        const newStock = Math.max(0, p.stock - totalQty);
+        return { ...p, stock: newStock, available: newStock > 0 ? p.available : false };
+      }
+      return p;
+    }),
+  })),
   addItemToOrder: (orderId, item) =>
     set((s) => ({
       orders: s.orders.map((o) =>
         o.id === orderId ? { ...o, items: [...o.items, item], status: 'andamento' as const } : o
       ),
+      // Auto deduct stock for added item
+      products: s.products.map((p) => {
+        if (p.id === item.productId) {
+          const newStock = Math.max(0, p.stock - item.quantity);
+          return { ...p, stock: newStock, available: newStock > 0 ? p.available : false };
+        }
+        return p;
+      }),
     })),
   removeItemFromOrder: (orderId, itemId) =>
     set((s) => ({
@@ -64,13 +85,5 @@ export const useRestaurantStore = create<RestaurantState>((set) => ({
           ? { ...o, status: 'fechada' as const, paymentMethod, totalPaid, closedAt: new Date() }
           : o
       ),
-      products: s.products.map((p) => {
-        const order = s.orders.find((o) => o.id === orderId);
-        if (!order) return p;
-        const totalQty = order.items
-          .filter((i) => i.productId === p.id)
-          .reduce((sum, i) => sum + i.quantity, 0);
-        return totalQty > 0 ? { ...p, stock: Math.max(0, p.stock - totalQty) } : p;
-      }),
     })),
 }));
