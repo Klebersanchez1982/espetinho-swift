@@ -9,6 +9,7 @@ import AppHeader from "@/components/AppHeader";
 import GarcomPage from "@/pages/GarcomPage";
 import AssadorPage from "@/pages/AssadorPage";
 import CaixaPage from "@/pages/CaixaPage";
+import EstoquePage from "@/pages/EstoquePage";
 import CardapioPage from "@/pages/CardapioPage";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ const MainApp = () => {
       {role === 'garcom' && <GarcomPage />}
       {role === 'assador' && <AssadorPage />}
       {role === 'caixa' && <CaixaPage />}
+      {role === 'caixa' && <EstoquePage />}
     </div>
   );
 };
