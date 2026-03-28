@@ -129,7 +129,7 @@ const CaixaPage = () => {
         </div>
 
         {order.client.phone && (
-          <Button variant="outline" size="lg" onClick={() => sendWhatsApp(order, false)} className="gap-2">
+          <Button size="lg" className="gap-2 bg-[#25D366] hover:bg-[#1da851] text-white" onClick={() => sendWhatsApp(order, false)}>
             <MessageCircle className="h-5 w-5" /> Enviar Comanda via WhatsApp
           </Button>
         )}
@@ -190,7 +190,7 @@ const CaixaPage = () => {
           R$ {order.items.reduce((s, i) => s + i.price * i.quantity, 0).toFixed(2)}
         </p>
         {order.client.phone && (
-          <Button variant="outline" size="lg" onClick={() => sendWhatsApp(order, true)} className="gap-2">
+          <Button size="lg" className="gap-2 bg-[#25D366] hover:bg-[#1da851] text-white" onClick={() => sendWhatsApp(order, true)}>
             <MessageCircle className="h-5 w-5" /> Enviar Comprovante WhatsApp
           </Button>
         )}

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useRestaurantStore } from '@/store/restaurant-store';
 import { Order, OrderItem, CATEGORIES } from '@/types/restaurant';
-import { Plus, Minus, ShoppingCart, ArrowLeft, ClipboardList, Eye } from 'lucide-react';
+import { Plus, Minus, ShoppingCart, ArrowLeft, ClipboardList, MessageCircle } from 'lucide-react';
 
 const GarcomPage = () => {
   const { products, orders, addOrder, addItemToOrder } = useRestaurantStore();
@@ -86,6 +86,15 @@ const GarcomPage = () => {
 
   const detailOrder = selectedOrder ? orders.find((o) => o.id === selectedOrder) : null;
 
+  const sendWhatsApp = (o: typeof detailOrder) => {
+    if (!o) return;
+    const orderTotal = o.items.reduce((s, i) => s + i.price * i.quantity, 0);
+    const items = o.items.map((i) => `${i.quantity}x ${i.productName} - R$${(i.price * i.quantity).toFixed(2)}`).join('%0A');
+    const msg = `📋 *Comanda - Na Brasa*%0A%0ACliente: ${o.client.name}%0AMesa: ${o.table}%0A%0A${items}%0A%0A*Total: R$${orderTotal.toFixed(2)}*`;
+    const phone = o.client.phone.replace(/\D/g, '');
+    window.open(`https://wa.me/${phone ? '55' + phone : ''}?text=${msg}`, '_blank');
+  };
+
   const statusColors: Record<string, string> = {
     pendente: 'bg-warning/20 text-warning',
     preparo: 'bg-primary/20 text-primary',
@@ -121,6 +130,15 @@ const GarcomPage = () => {
             </span>
           </div>
         </div>
+        {detailOrder.client.phone && (
+          <Button
+            size="xl"
+            className="bg-[#25D366] hover:bg-[#1da851] text-white gap-2"
+            onClick={() => sendWhatsApp(detailOrder)}
+          >
+            <MessageCircle className="h-5 w-5" /> Enviar Comanda via WhatsApp
+          </Button>
+        )}
         <Button size="xl" onClick={() => { setSelectedOrder(detailOrder.id); setView('new'); }}>
           <Plus className="h-5 w-5" /> Adicionar Itens
         </Button>
