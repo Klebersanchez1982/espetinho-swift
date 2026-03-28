@@ -6,6 +6,7 @@ interface RestaurantState {
   setRole: (role: UserRole | null) => void;
   
   products: Product[];
+  addProduct: (product: Product) => void;
   updateProductStock: (productId: string, qty: number) => void;
   toggleProductAvailability: (productId: string) => void;
   
@@ -22,6 +23,7 @@ export const useRestaurantStore = create<RestaurantState>((set) => ({
   setRole: (role) => set({ role }),
   
   products: INITIAL_PRODUCTS,
+  addProduct: (product) => set((s) => ({ products: [...s.products, product] })),
   updateProductStock: (productId, qty) =>
     set((s) => ({
       products: s.products.map((p) =>
